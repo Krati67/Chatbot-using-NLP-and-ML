@@ -57,14 +57,17 @@ def convert_audio_to_text_detect():
             print('failed'.format(e))
 
 #extra feature added to analyse the sentiments of the text (to tell whether the sentence is negative or positive)
-def analyse_sentiments():
+def analyse_sentiments(detected_language):
+
+    detect_language = detected_language
+
     print("Do you want the sentiment analysis of this sentenc?")
     print("Y/N")
     y_n = input()
     y_n = y_n.lower()
     if y_n == 'y':
         my_model = pipeline('sentiment-analysis')
-        print(my_model(main_function.detect_language)) #text to be entered
+        print(my_model(detect_language)) #text to be entered
         #how to use the detect_language variable in this function????
         #
     elif y_n == 'n':
@@ -82,20 +85,30 @@ def main_function():
         print("Language: ", detect(detect_language))
         ask_user_about_lang_pref()
         if ask_user_about_lang_pref.pref == 'english':
+
             print(t.translate(detect_language, lang_tgt='en'))
-            analyse_sentiments() #ADDED FOR TRIAL PURPOSES ONLY
+            
+            # print("Detect Language Value: ", detect_language)
+            # print("Detect Language Value: ", type(detect_language))
+            
+            analyse_sentiments(detect_language) #ADDED FOR TRIAL PURPOSES ONLY
+            
             # to_continue_further()
         elif ask_user_about_lang_pref.pref == 'hindi':
             print(t.translate(detect_language, lang_tgt='hi'))
             to_continue_further()
+
         elif ask_user_about_lang_pref.pref == 'deutsch':
             print(t.translate(detect_language, lang_tgt='de'))
             to_continue_further()
+
         elif ask_user_about_lang_pref.pref == 'french':
             print(t.translate(detect_language, lang_tgt='fr'))
             to_continue_further()
+
         else:
             print('Try Again!')
+            
     elif choice_of_input.human_text == 'speech':
         convert_audio_to_text_detect()
         ask_user_about_lang_pref()
