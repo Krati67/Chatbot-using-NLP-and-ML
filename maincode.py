@@ -81,9 +81,12 @@ def analyse_sentiments(detected_language):
 def main_function():
     choice_of_input()
     if choice_of_input.human_text == 'text':
+
         detect_language = input("PLease enter the text which you wish to translate: ")
+
         print("Language: ", detect(detect_language))
         ask_user_about_lang_pref()
+
         if ask_user_about_lang_pref.pref == 'english':
 
             print(t.translate(detect_language, lang_tgt='en'))
@@ -95,7 +98,9 @@ def main_function():
             
             # to_continue_further()
         elif ask_user_about_lang_pref.pref == 'hindi':
+
             print(t.translate(detect_language, lang_tgt='hi'))
+            
             to_continue_further()
 
         elif ask_user_about_lang_pref.pref == 'deutsch':
@@ -108,7 +113,7 @@ def main_function():
 
         else:
             print('Try Again!')
-            
+
     elif choice_of_input.human_text == 'speech':
         convert_audio_to_text_detect()
         ask_user_about_lang_pref()
