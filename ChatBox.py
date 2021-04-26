@@ -212,8 +212,13 @@ class ChatBox(Qtw.QMainWindow):
         if user_choice == 'y':
 
             my_model = pipeline('sentiment-analysis')
+            # coverting user text into english first
+            t = google_translator()
 
-            temp_var = my_model(self.user_text)
+            temp_text = t.translate(self.user_text, lang_tgt='en')
+            temp_var = my_model(temp_text)
+
+            # temp_var = my_model(self.user_text)
             temp_var = temp_var[0]
 
             temp_score = float(temp_var['score'])
