@@ -229,6 +229,9 @@ class ChatBox(Qtw.QMainWindow):
             self.send_message(False, "Sorry, I can't understand")
 
     def convert_audio_to_text_detect(self):
+
+        print("TESTING FOR SPEECH TO SEE IF FN IS CALLED")
+
         r1 = sr.Recognizer()
         with sr.Microphone() as source:
 
@@ -243,13 +246,14 @@ class ChatBox(Qtw.QMainWindow):
                 self.send_message(False, user_audio)  # user's audio as text
                 self.send_message(False, detect(user_audio))  # user's audio's text's lang
 
-                self.ask_user_about_lang_pref()
-
             except sr.UnkownValueError:
                 self.send_message(False, 'error')
 
             except sr.RequestError as e:
                 self.send_message(False, 'failed'.format(e))
+
+            else:
+                self.ask_user_about_lang_pref()
 
     def move_with_click_title_bar(self, event):
 
