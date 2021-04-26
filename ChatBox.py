@@ -6,7 +6,11 @@ from PyQt5 import QtGui as Qtg
 from PyQt5 import QtCore as Qtc
 
 # code functions
+import time
 from langdetect import detect
+from google_trans_new import google_translator
+import speech_recognition as sr
+from transformers import pipeline
 
 # Code to show error, if the app crashes
 import cgitb
@@ -35,10 +39,12 @@ class ChatBox(Qtw.QMainWindow):
         # Sequence variables
 
         # chat_bot_sequence will show contain the sequences that program will go through
-        self.chat_bot_sequence = ["text_or_speech", "detect_language", ""]
+        self.chat_bot_sequence = ["text_or_speech", "detect_language", "translate_to_lang", "analyse_continue", "continue_restart"]
 
         # we use current sequence to update to the next sequence
         self.current_sequence = self.chat_bot_sequence[0]
+
+        self.user_text = ""
 
         self.send_message(False, "Hey I am Kratzz!")
         self.send_message(False, "I am your personal translator.")
@@ -76,13 +82,14 @@ class ChatBox(Qtw.QMainWindow):
                 if self.current_sequence == "text_or_speech":
 
                     human_text = self.userInputText.toPlainText()
+                    human_text = human_text.lower()
 
-                    if human_text.lower() == "text":  # converting to lower case
+                    if human_text == "text":  # converting to lower case
                         self.selected_text()
 
-                    elif human_text.lower() == "speech":  # converting to lower case
+                    elif human_text == "speech":  # converting to lower case
                         # we can define fn to what should happen if user selects speech
-                        pass
+                        self.convert_audio_to_text_detect()
 
                     else:
                         # will update the correct_input var so that the program will continue only if there is a valid input
@@ -92,6 +99,18 @@ class ChatBox(Qtw.QMainWindow):
                 if self.current_sequence == "detect_language":
                     language_to_detect = self.userInputText.toPlainText()
                     self.detect_language(language_to_detect)
+
+                if self.current_sequence == "translate_to_lang":
+                    language_to_detect = self.userInputText.toPlainText()
+                    self.translate_text_to_(language_to_detect)
+
+                if self.current_sequence == "analyse_continue":
+                    language_to_detect = self.userInputText.toPlainText()
+                    self.analyse_continue(language_to_detect)
+
+                if self.current_sequence == "continue_restart":
+                    language_to_detect = self.userInputText.toPlainText()
+                    self.restart_continued(language_to_detect)
 
                 current_sequence_location = int(self.chat_bot_sequence.index(f"{self.current_sequence}"))
 
@@ -112,6 +131,9 @@ class ChatBox(Qtw.QMainWindow):
         self.send_message(False, "Please enter the text which you wish to translate: ")
 
     def detect_language(self, detect_language):
+
+        self.user_text = detect_language
+
         self.send_message(False, f"User's input lang is: {detect(detect_language)}")
 
         self.ask_user_about_lang_pref()  # calling kranti fn
@@ -122,6 +144,112 @@ class ChatBox(Qtw.QMainWindow):
         self.send_message(False, "2. Hindi")
         self.send_message(False, "3. Deutsch")
         self.send_message(False, "4. French")
+
+    def translate_text_to_(self, user_lang):
+
+        t = google_translator()
+
+        user_lang = user_lang.lower()
+
+        if user_lang == 'english':
+
+            self.send_message(False, t.translate(self.user_text, lang_tgt='en'))
+            self.analyse_sentiments()  # ADDED FOR TRIAL PURPOSES ONLY
+
+            # to_continue_further()
+        elif user_lang == 'hindi':
+
+            self.send_message(False, t.translate(self.user_text, lang_tgt='hi'))
+            self.analyse_sentiments()
+
+        elif user_lang == 'deutsch':
+
+            self.send_message(False, t.translate(self.user_text, lang_tgt='de'))
+            self.analyse_sentiments()
+
+        elif user_lang == 'french':
+
+            self.send_message(False, t.translate(self.user_text, lang_tgt='fr'))
+            self.analyse_sentiments()
+
+        else:
+            self.send_message(False, 'Try Again!')
+
+    def analyse_sentiments(self):
+
+        self.send_message(False, "Do you want the sentiment analysis of this sentence?")
+        self.send_message(False, "Y/N")
+
+    def analyse_continue(self, user_choice):
+        print("User Choice", user_choice)
+        user_choice = user_choice.lower()
+
+        if user_choice == 'y':
+
+            my_model = pipeline('sentiment-analysis')
+
+            temp_var = my_model(self.user_text)
+            temp_var = temp_var[0]
+
+            temp_score = float(temp_var['score'])
+            temp_score *= 100
+            temp_score = round(temp_score, 1)
+
+            self.send_message(False, f"The analysis is {temp_var['label']} with score of {temp_score}%")
+            self.restart_program()
+
+        elif user_choice == 'n':
+
+            self.send_message(False, "Thank you! ")
+            self.restart_program()
+
+        else:
+            self.send_message(False, "Sorry, I can't understand")
+
+    def restart_program(self):
+
+        self.send_message(False, "Do you wish to continue further??")
+        self.send_message(False, "Y/N")
+
+    def restart_continued(self, user_choice):
+
+        user_choice = user_choice.lower()
+
+        if user_choice == 'y':
+
+            self.choice_of_input()
+            self.current_sequence = self.chat_bot_sequence[0]
+
+        elif user_choice == 'n':
+            self.send_message(False, "Thank you! ")
+            time.sleep(2)
+            self.close()
+
+        else:
+            self.send_message(False, "Sorry, I can't understand")
+
+    def convert_audio_to_text_detect(self):
+        r1 = sr.Recognizer()
+        with sr.Microphone() as source:
+
+            self.send_message(False, 'SPEAK NOW...')
+            audio = r1.listen(source)
+
+            try:
+                self.send_message(False, 'detecting...')
+
+                # convert_audio_to_text_detect.get = r1.recognize_google(audio)
+                user_audio = r1.recognize_google(audio)
+                self.send_message(False, user_audio)  # user's audio as text
+                self.send_message(False, detect(user_audio))  # user's audio's text's lang
+
+                self.ask_user_about_lang_pref()
+
+            except sr.UnkownValueError:
+                self.send_message(False, 'error')
+
+            except sr.RequestError as e:
+                self.send_message(False, 'failed'.format(e))
 
     def move_with_click_title_bar(self, event):
 
