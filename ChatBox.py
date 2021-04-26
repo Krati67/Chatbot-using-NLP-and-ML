@@ -61,6 +61,8 @@ class ChatBox(Qtw.QMainWindow):
         self.send_message(False, '1. Text')
         self.send_message(False, '2. Speech')
 
+        print("Currently at: [choice of input]", self.current_sequence)
+
     def send_message(self, message_from, message=""):
 
         correct_input = True  # if invalid input program does not go further
@@ -75,6 +77,7 @@ class ChatBox(Qtw.QMainWindow):
 
             if temp_dataset[1]:
                 # User
+
                 self.text_display += f"<div style='color: #ffa500'>[You]: {temp_dataset[2]}</div> <br />"
 
                 self.chatsText.setText(self.text_display)
@@ -101,24 +104,40 @@ class ChatBox(Qtw.QMainWindow):
                     self.detect_language(language_to_detect)
 
                 if self.current_sequence == "translate_to_lang":
-                    language_to_detect = self.userInputText.toPlainText()
-                    self.translate_text_to_(language_to_detect)
+
+                    translate_to = self.userInputText.toPlainText()
+
+                    verify_var = self.translate_text_to_(translate_to)
+
+                    if not verify_var:
+                        correct_input = False
 
                 if self.current_sequence == "analyse_continue":
-                    language_to_detect = self.userInputText.toPlainText()
-                    self.analyse_continue(language_to_detect)
+
+                    continue_analysis = self.userInputText.toPlainText()
+                    verify_var = self.analyse_continue(continue_analysis)
+
+                    if not verify_var:
+                        correct_input = False
 
                 if self.current_sequence == "continue_restart":
-                    language_to_detect = self.userInputText.toPlainText()
-                    self.restart_continued(language_to_detect)
+
+                    continue_restart = self.userInputText.toPlainText()
+                    verify_var = self.restart_continued(continue_restart)
+
+                    if not verify_var:
+                        correct_input = False
 
                 current_sequence_location = int(self.chat_bot_sequence.index(f"{self.current_sequence}"))
 
                 print(correct_input)
 
                 if correct_input:  # only update to go to the next sequence if all inputs are valid
+                    print(f"Current Sequence Location{(current_sequence_location + 1)}, Len of Sequence{len(self.chat_bot_sequence)}")
                     if (current_sequence_location + 1) < len(self.chat_bot_sequence):
                         self.current_sequence = self.chat_bot_sequence[current_sequence_location + 1]
+                    elif (current_sequence_location + 1) >= len(self.chat_bot_sequence):
+                        self.current_sequence = self.chat_bot_sequence[0]
 
             elif not temp_dataset[1]:
                 # Bot
@@ -136,7 +155,7 @@ class ChatBox(Qtw.QMainWindow):
 
         self.send_message(False, f"User's input lang is: {detect(detect_language)}")
 
-        self.ask_user_about_lang_pref()  # calling kranti fn
+        self.ask_user_about_lang_pref()
 
     def ask_user_about_lang_pref(self):
         self.send_message(False, "In which language do you wish to translate?")
@@ -147,6 +166,8 @@ class ChatBox(Qtw.QMainWindow):
 
     def translate_text_to_(self, user_lang):
 
+        correct_input = True
+
         t = google_translator()
 
         user_lang = user_lang.lower()
@@ -156,7 +177,6 @@ class ChatBox(Qtw.QMainWindow):
             self.send_message(False, t.translate(self.user_text, lang_tgt='en'))
             self.analyse_sentiments()  # ADDED FOR TRIAL PURPOSES ONLY
 
-            # to_continue_further()
         elif user_lang == 'hindi':
 
             self.send_message(False, t.translate(self.user_text, lang_tgt='hi'))
@@ -173,7 +193,10 @@ class ChatBox(Qtw.QMainWindow):
             self.analyse_sentiments()
 
         else:
+            correct_input = False
             self.send_message(False, 'Try Again!')
+
+        return correct_input
 
     def analyse_sentiments(self):
 
@@ -181,7 +204,9 @@ class ChatBox(Qtw.QMainWindow):
         self.send_message(False, "Y/N")
 
     def analyse_continue(self, user_choice):
-        print("User Choice", user_choice)
+
+        correct_input = True
+
         user_choice = user_choice.lower()
 
         if user_choice == 'y':
@@ -204,7 +229,10 @@ class ChatBox(Qtw.QMainWindow):
             self.restart_program()
 
         else:
-            self.send_message(False, "Sorry, I can't understand")
+            correct_input = False
+            self.send_message(False, "Sorry, I can't understand if I should continue analysing")
+
+        return correct_input
 
     def restart_program(self):
 
@@ -213,20 +241,25 @@ class ChatBox(Qtw.QMainWindow):
 
     def restart_continued(self, user_choice):
 
+        correct_input = True
+
         user_choice = user_choice.lower()
 
         if user_choice == 'y':
 
             self.choice_of_input()
-            self.current_sequence = self.chat_bot_sequence[0]
 
         elif user_choice == 'n':
+
             self.send_message(False, "Thank you! ")
             time.sleep(2)
             self.close()
 
         else:
-            self.send_message(False, "Sorry, I can't understand")
+            correct_input = False
+            self.send_message(False, "Sorry, I can't understand if I should restart")
+
+        return correct_input
 
     def convert_audio_to_text_detect(self):
 
