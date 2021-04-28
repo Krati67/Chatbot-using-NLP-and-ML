@@ -11,6 +11,9 @@ from langdetect import detect
 from google_trans_new import google_translator
 import speech_recognition as sr
 from transformers import pipeline
+#before language detection in order to enforce consistent results use DetectorFactory
+from langdetect import DetectorFactory
+DetectorFactory.seed = 0
 
 # Code to show error, if the app crashes
 import cgitb
@@ -269,15 +272,19 @@ class ChatBox(Qtw.QMainWindow):
     def convert_audio_to_text_detect(self):
 
         print("TESTING FOR SPEECH TO SEE IF FN IS CALLED")
+        self.send_message(False, 'SPEAK NOW...')
+        self.send_message(False, 'detecting...')
 
         r1 = sr.Recognizer()
         with sr.Microphone() as source:
 
-            self.send_message(False, 'SPEAK NOW...')
+            # below line doesnt work because if you wait for the bot to display it will show UnknownvalueError
+            #self.send_message(False, 'SPEAK NOW...')THAT IS WHY ADDED ON LINE 275
             audio = r1.listen(source)
 
             try:
-                self.send_message(False, 'detecting...')
+                # even this doesnt work shows the same thing...
+                #self.send_message(False, 'detecting...') THAT IS WHY ADDED ON LINE 276
 
                 # convert_audio_to_text_detect.get = r1.recognize_google(audio)
                 user_audio = r1.recognize_google(audio)
