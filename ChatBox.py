@@ -42,7 +42,7 @@ class ChatBox(Qtw.QMainWindow):
         # Sequence variables
 
         # chat_bot_sequence will show contain the sequences that program will go through
-        self.chat_bot_sequence = ["text_or_speech", "detect_language", "translate_to_lang", "analyse_continue", "continue_restart"]
+        self.chat_bot_sequence = ["text_or_speech", "detect_language", "translate_to_lang", "analyse_continue", "continue_restart", ]
 
         # we use current sequence to update to the next sequence
         self.current_sequence = self.chat_bot_sequence[0]
@@ -272,6 +272,9 @@ class ChatBox(Qtw.QMainWindow):
     def convert_audio_to_text_detect(self):
 
         print("TESTING FOR SPEECH TO SEE IF FN IS CALLED")
+
+        self.current_sequence = self.chat_bot_sequence[1]
+
         self.send_message(False, 'SPEAK NOW...')
         self.send_message(False, 'detecting...')
 
