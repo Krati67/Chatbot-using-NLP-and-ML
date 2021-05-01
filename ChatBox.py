@@ -79,6 +79,8 @@ class ChatBox(Qtw.QMainWindow):
             self.messages.append(temp_dataset)
 
             if temp_dataset[1]:
+                print("from: ", message_from)
+                print("value ", message)
                 # User
 
                 self.text_display += f"<div style='color: #ffa500'>[You]: {temp_dataset[2]}</div> <br />"
@@ -96,6 +98,7 @@ class ChatBox(Qtw.QMainWindow):
                     elif human_text == "speech":  # converting to lower case
                         # we can define fn to what should happen if user selects speech
                         self.convert_audio_to_text_detect()
+                        self.current_sequence = "from_speech"
 
                     else:
                         # will update the correct_input var so that the program will continue only if there is a valid input
@@ -135,6 +138,7 @@ class ChatBox(Qtw.QMainWindow):
 
                     translate_to = self.userInputText.toPlainText()
                     verify_var = self.translate_text_to_(translate_to)
+                    print("trying " , translate_to)
 
                     if not verify_var:
                         correct_input = False
@@ -148,9 +152,11 @@ class ChatBox(Qtw.QMainWindow):
                 print(correct_input)
 
                 if correct_input:  # only update to go to the next sequence if all inputs are valid
+                    print("current sequence: ", self.current_sequence)
                     print(f"Current Sequence Location{(current_sequence_location + 1)}, Len of Sequence{len(self.chat_bot_sequence)}")
                     if (current_sequence_location + 1) < len(self.chat_bot_sequence):
                         self.current_sequence = self.chat_bot_sequence[current_sequence_location + 1]
+                        print(" updated current sequence: ", self.current_sequence)
                     elif (current_sequence_location + 1) >= len(self.chat_bot_sequence):
                         self.current_sequence = self.chat_bot_sequence[0]
 
@@ -208,8 +214,9 @@ class ChatBox(Qtw.QMainWindow):
             self.analyse_sentiments()
 
         else:
+            print(user_lang)
             correct_input = False
-            self.send_message(False, 'Try Again!')
+            #self.send_message(False, 'Try Again!')
 
         return correct_input
 
@@ -291,7 +298,7 @@ class ChatBox(Qtw.QMainWindow):
         with sr.Microphone() as source:
 
             # below line doesnt work because if you wait for the bot to display it will show UnknownvalueError
-            #self.send_message(False, 'SPEAK NOW...')THAT IS WHY ADDED ON LINE 275
+            #self.send_message(False, 'SPEAK NOW...') #THAT IS WHY ADDED ON LINE 275
             print("reached here...")
             r1.pause_threshold = 1
             r1.adjust_for_ambient_noise(source)
@@ -299,12 +306,15 @@ class ChatBox(Qtw.QMainWindow):
 
             try:
                 # even this doesnt work shows the same thing...
-                #self.send_message(False, 'detecting...') THAT IS WHY ADDED ON LINE 276
+                #self.send_message(False, 'detecting...') #THAT IS WHY ADDED ON LINE 276
 
                 # convert_audio_to_text_detect.get = r1.recognize_google(audio)
                 user_audio = r1.recognize_google(audio)
-                self.send_message(True, user_audio)  # user's audio as text
-                self.send_message(True, detect(user_audio))  # user's audio's text's lang
+                # self.send_message(False, user_audio)  # user's audio as text
+                # self.send_message(False, detect(user_audio))  # user's audio's text's lang
+                #temp_audio = detect(user_audio)
+                self.send_message(False, user_audio)
+                self.detect_language(user_audio)
 
             except sr.UnkownValueError:
                 self.send_message(False, 'error')
@@ -313,8 +323,10 @@ class ChatBox(Qtw.QMainWindow):
                 self.send_message(False, 'failed'.format(e))
 
             else:
-                self.ask_user_about_lang_pref()
-                self.current_sequence = "from_speech"
+
+                # self.send_message(False, temp_audio)
+                print("correct")
+
 
     def move_with_click_title_bar(self, event):
 
