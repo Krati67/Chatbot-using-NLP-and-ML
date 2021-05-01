@@ -42,7 +42,7 @@ class ChatBox(Qtw.QMainWindow):
         # Sequence variables
 
         # chat_bot_sequence will show contain the sequences that program will go through
-        self.chat_bot_sequence = ["text_or_speech", "detect_language", "translate_to_lang", "analyse_continue", "continue_restart", ]
+        self.chat_bot_sequence = ["text_or_speech", "detect_language", "translate_to_lang", "analyse_continue", "continue_restart"]
 
         # we use current sequence to update to the next sequence
         self.current_sequence = self.chat_bot_sequence[0]
@@ -272,9 +272,6 @@ class ChatBox(Qtw.QMainWindow):
     def convert_audio_to_text_detect(self):
 
         print("TESTING FOR SPEECH TO SEE IF FN IS CALLED")
-
-        self.current_sequence = self.chat_bot_sequence[1]
-
         self.send_message(False, 'SPEAK NOW...')
         self.send_message(False, 'detecting...')
 
@@ -283,7 +280,10 @@ class ChatBox(Qtw.QMainWindow):
 
             # below line doesnt work because if you wait for the bot to display it will show UnknownvalueError
             #self.send_message(False, 'SPEAK NOW...')THAT IS WHY ADDED ON LINE 275
-            audio = r1.listen(source)
+            print("reached here...")
+            r1.pause_threshold = 1
+            r1.adjust_for_ambient_noise(source)
+            audio = r1.listen(source, phrase_time_limit=6)
 
             try:
                 # even this doesnt work shows the same thing...
