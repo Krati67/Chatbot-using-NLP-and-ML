@@ -131,6 +131,14 @@ class ChatBox(Qtw.QMainWindow):
                     if not verify_var:
                         correct_input = False
 
+                if self.current_sequence == "from_speech":
+
+                    translate_to = self.userInputText.toPlainText()
+                    verify_var = self.translate_text_to_(translate_to)
+
+                    if not verify_var:
+                        correct_input = False
+
                 current_sequence_location = int(self.chat_bot_sequence.index(f"{self.current_sequence}"))
 
                 print(correct_input)
@@ -302,6 +310,7 @@ class ChatBox(Qtw.QMainWindow):
 
             else:
                 self.ask_user_about_lang_pref()
+                self.current_sequence = "from_speech"
 
     def move_with_click_title_bar(self, event):
 
