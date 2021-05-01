@@ -139,7 +139,11 @@ class ChatBox(Qtw.QMainWindow):
                     if not verify_var:
                         correct_input = False
 
-                current_sequence_location = int(self.chat_bot_sequence.index(f"{self.current_sequence}"))
+                try:
+                    current_sequence_location = int(self.chat_bot_sequence.index(f"{self.current_sequence}"))
+
+                except ValueError:
+                    current_sequence_location = 2
 
                 print(correct_input)
 
@@ -299,8 +303,8 @@ class ChatBox(Qtw.QMainWindow):
 
                 # convert_audio_to_text_detect.get = r1.recognize_google(audio)
                 user_audio = r1.recognize_google(audio)
-                self.send_message(False, user_audio)  # user's audio as text
-                self.send_message(False, detect(user_audio))  # user's audio's text's lang
+                self.send_message(True, user_audio)  # user's audio as text
+                self.send_message(True, detect(user_audio))  # user's audio's text's lang
 
             except sr.UnkownValueError:
                 self.send_message(False, 'error')
