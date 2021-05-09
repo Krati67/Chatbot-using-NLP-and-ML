@@ -7,6 +7,7 @@ Before executing the program on your machine, make sure your virtual environment
 4. pip install transformers torch sentencepiece (to perform sentiment analysis)
 5. pip install pyaudio 
 6. pip install PyQt5 (for user interface)
+7. pip install iso-639
 
 In case if the pyaudio doesnt work in pycharm, do the following installation:
 1. pip install pipwin
