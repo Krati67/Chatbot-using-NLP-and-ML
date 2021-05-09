@@ -68,7 +68,7 @@ class ChatBox(Qtw.QMainWindow):
         self.send_message(False, '2. Speech')
         print("Currently at: [choice of input]", self.current_sequence)
 
-    def send_message(self, message_from, message=""):
+    def send_message(self, message_from, message="", show_color=False):
         correct_input = True  # if invalid input program does not go further
 
         if message == "" and message_from:
@@ -156,8 +156,13 @@ class ChatBox(Qtw.QMainWindow):
 
             elif not temp_dataset[1]:
                 # Bot
-                self.text_display += f"<div style='color: #acc9e6'>[Bot]: {message}</div> <br />"
-                self.chatsText.setText(self.text_display)
+
+                if show_color:
+                    self.text_display += f"<div style='color: #ffa500'>[You]: {message}</div> <br />"
+                    self.chatsText.setText(self.text_display)
+                else:
+                    self.text_display += f"<div style='color: #acc9e6'>[Bot]: {message}</div> <br />"
+                    self.chatsText.setText(self.text_display)
 
             self.userInputText.setText("")
 
@@ -283,8 +288,8 @@ class ChatBox(Qtw.QMainWindow):
 
             try:
                 user_audio = r1.recognize_google(audio)
-                #self.send_message(f"<div style='color: #ffa500'>[You]:</div>", user_audio)
-                self.send_message(False, user_audio)
+                # self.send_message(f"<div style='color: #ffa500'>[You]:</div>", user_audio)
+                self.send_message(False, user_audio, show_color=True)
                 self.detect_language(user_audio)
 
             except sr.UnkownValueError:
