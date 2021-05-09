@@ -22,7 +22,7 @@ import cgitb
 cgitb.enable(format='text')
 
 #Dependencies to add in the virtual env
-# pip install langdetect, google_trans_new, speechrecognition, requests, transformers torch sentencepiece, pyaudio.
+# pip install langdetect, google_trans_new, speechrecognition, requests, transformers torch sentencepiece, pyaudio, iso-639.
 
 # noinspection PyMethodMayBeStatic,PyAttributeOutsideInit
 class ChatBox(Qtw.QMainWindow):
@@ -37,9 +37,7 @@ class ChatBox(Qtw.QMainWindow):
         uic.loadUi(r"UI\\Chat Box.ui", self)
 
         self.setWindowFlag(Qtc.Qt.FramelessWindowHint)
-
         self.header_frame.mouseMoveEvent = self.move_with_click_title_bar
-
         self.show()  # show the UI
 
         # Sequence variables
@@ -49,16 +47,11 @@ class ChatBox(Qtw.QMainWindow):
 
         # we use current sequence to update to the next sequence
         self.current_sequence = self.chat_bot_sequence[0]
-
         self.user_text = ""
-
         self.send_message(False, "Hey I am Kratzz!")
         self.send_message(False, "I am your personal translator.")
-
         self.choice_of_input()
-
         self.sendButton.clicked.connect(lambda: self.send_message(True, message=self.userInputText.toPlainText()))
-
         self.minimiseButton.clicked.connect(lambda: self.showMinimized())
         self.closeButton.clicked.connect(lambda: self.close())
 
@@ -80,7 +73,6 @@ class ChatBox(Qtw.QMainWindow):
 
             if temp_dataset[1]:
                 # User
-
                 self.text_display += f"<div style='color: #ffa500'>[You]: {temp_dataset[2]}</div> <br />"
                 self.chatsText.setText(self.text_display)
                 if self.current_sequence == "text_or_speech":
@@ -104,16 +96,12 @@ class ChatBox(Qtw.QMainWindow):
                     self.detect_language(language_to_detect)
 
                 if self.current_sequence == "translate_to_lang":
-
                     translate_to = self.userInputText.toPlainText()
-
                     verify_var = self.translate_text_to_(translate_to)
-
                     if not verify_var:
                         correct_input = False
 
                 if self.current_sequence == "analyse_continue":
-
                     continue_analysis = self.userInputText.toPlainText()
                     verify_var = self.analyse_continue(continue_analysis)
 
@@ -121,7 +109,6 @@ class ChatBox(Qtw.QMainWindow):
                         correct_input = False
 
                 if self.current_sequence == "continue_restart":
-
                     continue_restart = self.userInputText.toPlainText()
                     verify_var = self.restart_continued(continue_restart)
 
@@ -129,7 +116,6 @@ class ChatBox(Qtw.QMainWindow):
                         correct_input = False
 
                 if self.current_sequence == "from_speech":
-
                     translate_to = self.userInputText.toPlainText()
                     verify_var = self.translate_text_to_(translate_to)
                     print("trying " , translate_to)
@@ -156,7 +142,6 @@ class ChatBox(Qtw.QMainWindow):
 
             elif not temp_dataset[1]:
                 # Bot
-
                 if show_color:
                     self.text_display += f"<div style='color: #ffa500'>[You]: {message}</div> <br />"
                     self.chatsText.setText(self.text_display)
@@ -191,7 +176,6 @@ class ChatBox(Qtw.QMainWindow):
         correct_input = True
         t = google_translator()
         user_lang = user_lang.lower()
-
         if user_lang == 'english':
             self.send_message(False, t.translate(self.user_text, lang_tgt='en'))
             self.analyse_sentiments()  # ADDED FOR TRIAL PURPOSES ONLY
@@ -303,7 +287,6 @@ class ChatBox(Qtw.QMainWindow):
                 print("correct")
 
     def move_with_click_title_bar(self, event):
-
         if event.buttons() == Qtc.Qt.LeftButton:
             self.move(self.pos() + event.globalPos() - self.dragPos)
             self.dragPos = event.globalPos()
@@ -311,7 +294,6 @@ class ChatBox(Qtw.QMainWindow):
 
     def mousePressEvent(self, event):
         self.dragPos = event.globalPos()
-
 
 if __name__ == "__main__":
     app = Qtw.QApplication(sys.argv)
